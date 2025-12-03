@@ -1,0 +1,14 @@
+{
+  "name": "YuukiDev.CharacterController",
+  "references": [
+    "Unity.InputSystem"
+  ],
+  "optionalUnityReferences": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": []
+}
