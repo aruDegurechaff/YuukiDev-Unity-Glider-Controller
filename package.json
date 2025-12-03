@@ -1,0 +1,25 @@
+{
+  "name": "com.yuukidev.glidercontroller",
+  "version": "1.1.0",
+  "displayName": "YuukiDev Glider Controller",
+  "description": "This a Glider Controller for an infinite glider game.",
+  "unity": "6000.2",
+  "unityRelease": "10f1",
+  "documentationUrl": "idk",
+  "changelogUrl": "idk",
+  "licensesUrl": "idk",
+  "dependencies": {
+    "com.unity.inputsystem": "1.7.0"
+  },
+  "keywords": [
+    "yuukidev",
+    "glider",
+    "controller",
+    "unity"
+  ],
+  "author": {
+    "name": "Aldreck Paul L. Obenario",
+    "email": "aldreckdegurechaff@gmail.com",
+    "url": "https://arudegurechaff.github.io/aruDegurechaff.portfolio.github.io/"
+  }
+}
