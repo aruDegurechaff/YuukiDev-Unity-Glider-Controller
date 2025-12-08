@@ -1,0 +1,116 @@
+{
+    "version": 1,
+    "name": "MovementCtrls",
+    "maps": [
+        {
+            "name": "Camera",
+            "id": "f0f0022f-40a4-47b7-b714-ae6630912c09",
+            "actions": [
+                {
+                    "name": "Look",
+                    "type": "Value",
+                    "id": "fc6fdd47-ce2b-4c70-bdfe-9f7f25bbccf2",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "83f55eee-a694-49ab-9407-2479850d07da",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8d23f0ed-0205-4474-9383-97534adefbee",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Movement",
+            "id": "3c9e26f4-903f-4f3d-9945-341ad79ec232",
+            "actions": [
+                {
+                    "name": "Speedup",
+                    "type": "Button",
+                    "id": "80c58d1e-6d39-4615-9146-19f9c7028bf4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Slowdown",
+                    "type": "Button",
+                    "id": "e6116e10-c775-4298-a7f4-7fff879d30f6",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "15949409-ef55-495e-959b-43d62d8fdb0a",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Speedup",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9c1706f3-3636-4023-92a9-29979981f099",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Speedup",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "161cfd2c-3d7c-4be9-9b46-3e3b441e9d99",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Slowdown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a6c841c9-6cf3-49fa-a5a2-ef95b8bd9c84",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Slowdown",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

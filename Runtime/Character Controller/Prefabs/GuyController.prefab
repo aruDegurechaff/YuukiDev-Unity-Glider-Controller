@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: YuukiDev.CharacterController::YuukiDev.Controller.CameraFollowAndRotate
   target: {fileID: 2506989590042637456}
-  smoothTime: 0.15
+  smoothTime: 0.05
   offset: {x: 0, y: 0, z: 0}
   sensitivity: 0.25
   maxVerticalAngle: 80
@@ -302,20 +302,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a011b1a6baa04b343ba099c16ed50946, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  baseSpeed: 25
-  maxSpeed: 45
-  minSpeed: 5
+  baseSpeed: 14
+  maxSpeed: 90
+  minSpeed: 7
   liftStrength: 8
   thrustFactor: 10
   dragCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  rotationSpeed: 4
-  bankStrength: 55
-  bankReturnSpeed: 2
+  rotationSpeed: 2
+  bankStrength: 35
+  bankReturnSpeed: 1
+  speedUpMultiplier: 38
+  slowDownMultiplier: 12
+  controlHardnessFast: 0.6
+  controlSoftnessSlow: 2.5
 --- !u!114 &128141086200036689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -328,6 +350,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b042b9ad09954c46a9cd77aa835063b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
+  speedUpIsToggle: 0
+  slowDownIsToggle: 0
   cameraFollow: {fileID: 6114682495799435009}
 --- !u!1001 &8218960346861085809
 PrefabInstance:

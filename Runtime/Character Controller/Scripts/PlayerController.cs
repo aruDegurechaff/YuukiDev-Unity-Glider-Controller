@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using YuukiDev.Input;
 
 namespace YuukiDev.Controller
 {
@@ -21,6 +22,14 @@ namespace YuukiDev.Controller
         [SerializeField] private float rotationSpeed = 5.5f;
         [SerializeField] private float bankStrength = 20f;
         [SerializeField] private float bankReturnSpeed = 1f;
+
+        [Header("Speed Change Settings")]
+        [SerializeField] private float speedUpMultiplier = 1.8f;
+        [SerializeField] private float slowDownMultiplier = 0.65f;
+
+        // Faster = harder to control Slower = easier to control
+        [SerializeField] private float controlHardnessFast = 0.55f;
+        [SerializeField] private float controlSoftnessSlow = 1.35f;
 
         private Rigidbody rb;
         private YuukiPlayerInput input;
@@ -60,30 +69,35 @@ namespace YuukiDev.Controller
             // Pitch as -180 to 180
             float pitch = transform.eulerAngles.x;
             if (pitch > 180) pitch -= 360;
-
             float pitchRad = pitch * Mathf.Deg2Rad;
 
-            // Thrust from pitching downward
+            // Downward pitch adds thrust
             float pitchAccel = Mathf.Sin(pitchRad) * thrustFactor;
-
-            // Adjust speed
             currentSpeed += pitchAccel * Time.fixedDeltaTime;
-            currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
 
-            // Forward movement
+            // Speedup / Slowdown input
+            if (input.IsSpeedingUp)
+                currentSpeed *= speedUpMultiplier;       // Increase speed sharply
+            else if (input.IsSlowingDown)
+                currentSpeed *= slowDownMultiplier;      // Reduce speed for stability
+
+            currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed); // Keep within limits
+
+            // Forward movement using current speed
             Vector3 targetForward = transform.forward * currentSpeed;
 
-            // Lift force (more speed = more lift)
+            // Lift increases with speed
             float lift = Mathf.Clamp01(currentSpeed / maxSpeed) * liftStrength;
             Vector3 liftForce = transform.up * lift;
 
-            // Drag based on speed (curve gives nicer realism I'm horny)
+            // Drag curve scales with normalized speed MMMMMMMMMMMMMMM CURVESSSS
             float dragAmount = dragCurve.Evaluate(currentSpeed / maxSpeed);
             Vector3 dragForce = -rb.linearVelocity * dragAmount;
 
-            // Final velocity
+            // Combined movement forces
             Vector3 finalVelocity = targetForward + liftForce + dragForce;
 
+            // Smooth velocity for less jitter
             rb.linearVelocity = Vector3.SmoothDamp(
                 rb.linearVelocity,
                 finalVelocity,
@@ -92,28 +106,35 @@ namespace YuukiDev.Controller
             );
         }
 
-        //  ROTATION & BANKING
+        // ROTATION & BANKING
         private void HandleRotation()
         {
-            float lookX = input.LookInput.x;
+            float lookX = input.LookInput.x; // Horizontal look input
+
+            float controlFactor = 1f;
+
+            // Harder to control when speeding up / softer when slowing down
+            if (input.IsSpeedingUp)
+                controlFactor = controlHardnessFast;      // Reduced steering power
+            else if (input.IsSlowingDown)
+                controlFactor = controlSoftnessSlow;      // Increased steering power
+
+            float adjustedBankStrength = bankStrength * controlFactor;
 
             // Banking left/right
             if (Mathf.Abs(lookX) > 0.01f)
-            {
-                bank = Mathf.Lerp(bank, -lookX * bankStrength, Time.deltaTime * 4f);
-            }
+                bank = Mathf.Lerp(bank, -lookX * adjustedBankStrength, Time.deltaTime * 4f);
             else
-            {
-                bank = Mathf.Lerp(bank, 0, Time.deltaTime * bankReturnSpeed);
-            }
+                bank = Mathf.Lerp(bank, 0, Time.deltaTime * bankReturnSpeed); // Return to center
 
-            // Apply rotation based on camera
+            // Rotation based on camera pivot + banking
             Quaternion desiredRot = Quaternion.Euler(
                 camPivot.eulerAngles.x,
                 camPivot.eulerAngles.y,
                 bank
             );
 
+            // Smooth rotation
             transform.rotation = Quaternion.Lerp(
                 transform.rotation,
                 desiredRot,

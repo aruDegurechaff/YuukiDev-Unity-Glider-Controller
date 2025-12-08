@@ -1,25 +1,28 @@
 using UnityEngine;
 
-public class CursorManager : MonoBehaviour
+namespace YuukiDev.OtherScripts
 {
-    [SerializeField] private bool hideCursor = true;
-
-    private void Start()
+    public class CursorManager : MonoBehaviour
     {
-        SetCursorState(hideCursor);
-    }
+        [SerializeField] private bool hideCursor = true;
 
-    public void SetCursorState(bool hide)
-    {
-        if (hide)
+        private void Start()
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            SetCursorState(hideCursor);
         }
-        else
+
+        public void SetCursorState(bool hide)
         {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            if (hide)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
         }
     }
 }
