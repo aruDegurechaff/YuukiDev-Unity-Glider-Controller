@@ -1,17 +1,34 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using YuukiDev.Input;
+using YuukiDev.OtherScripts;
 
 namespace YuukiDev.Controller
 {
     [DefaultExecutionOrder(-1)]
     public class CameraFollowAndRotate : MonoBehaviour
     {
+        [Header("Target Components")]
+        [SerializeField] private Camera cam;
+        public MovementTracker movementTracker;
+        public PlayerController playerController;
+        public YuukiPlayerInput input;
+        
+
         [Header("Follow Settings")]
         public Transform target;
         public float smoothTime = 0.15f;
         public Vector3 offset;
 
         private Vector3 smoothVelocity;
+
+        [Header("FOV Settings")]
+        public float baseFOV = 60f;
+        [SerializeField] private float fovBoostAmount = 10f; // how much FOV changes on speed-up
+        [SerializeField] private float fovSlowAmount = 5f;   // how much FOV changes on slow-down
+        [SerializeField] private float fovSmoothTime = 0.08f;
+
+        private float fovVelocity;
 
         [Header("Rotation Settings")]
         public float sensitivity = 0.25f;
@@ -60,6 +77,8 @@ namespace YuukiDev.Controller
         {
             FollowTarget();
             RotateCamera();
+
+            FOVDynamicUpdate();
         }
 
         private void FollowTarget()
@@ -124,6 +143,24 @@ namespace YuukiDev.Controller
                 targetOffset,
                 ref dynamicOffsetVelocity,
                 offsetSpeed
+            );
+        }
+
+        private void FOVDynamicUpdate()
+        {
+            float targetFOV = baseFOV;
+
+            if (input.IsSpeedingUp)
+                targetFOV += fovBoostAmount; // add fixed boost
+            else if (input.IsSlowingDown)
+                targetFOV -= fovSlowAmount;  // subtract fixed amount
+
+            // Smoothly update FOV
+            cam.fieldOfView = Mathf.SmoothDamp(
+                cam.fieldOfView,
+                targetFOV,
+                ref fovVelocity,
+                fovSmoothTime
             );
         }
     }

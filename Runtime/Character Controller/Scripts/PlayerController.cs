@@ -12,6 +12,7 @@ namespace YuukiDev.Controller
         [SerializeField] private float baseSpeed = 3f;
         [SerializeField] private float maxSpeed = 45f;
         [SerializeField] private float minSpeed = 1.5f;
+        [SerializeField] private float acceleration = 6f;
 
         [Header("Glide Forces")]
         [SerializeField] private float liftStrength = 12f;
@@ -39,6 +40,8 @@ namespace YuukiDev.Controller
         private float bank;
         private Vector3 smoothVel;
 
+        public float MaxSpeed => maxSpeed;
+
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
@@ -52,9 +55,6 @@ namespace YuukiDev.Controller
 
         private void Update()
         {
-            if (Keyboard.current.rKey.wasPressedThisFrame)
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
             HandleRotation();
         }
 
@@ -76,11 +76,20 @@ namespace YuukiDev.Controller
             currentSpeed += pitchAccel * Time.fixedDeltaTime;
 
             // Speedup / Slowdown input
-            if (input.IsSpeedingUp)
-                currentSpeed *= speedUpMultiplier;       // Increase speed sharply
-            else if (input.IsSlowingDown)
-                currentSpeed *= slowDownMultiplier;      // Reduce speed for stability
+            float targetSpeed = baseSpeed;
 
+            if (input.IsSpeedingUp)
+            {
+                targetSpeed = baseSpeed * speedUpMultiplier;  // Burst of speed
+                Debug.Log(targetSpeed);
+            }
+            else if (input.IsSlowingDown)
+            {
+                targetSpeed = baseSpeed * slowDownMultiplier; // Slow glide
+                Debug.Log(targetSpeed);
+            }
+
+            currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
             currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed); // Keep within limits
 
             // Forward movement using current speed
@@ -141,5 +150,7 @@ namespace YuukiDev.Controller
                 rotationSpeed * Time.deltaTime
             );
         }
+
+
     }
 }

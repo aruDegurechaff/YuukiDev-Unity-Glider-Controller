@@ -29,11 +29,13 @@ namespace YuukiDev.Input
             MovementCtrls.Enable();
 
             MovementCtrls.Camera.SetCallbacks(this);
+            MovementCtrls.Movement.SetCallbacks(this);
         }
 
         private void OnDisable()
         {
             MovementCtrls.Camera.RemoveCallbacks(this);
+            MovementCtrls.Movement.RemoveCallbacks(this);
             MovementCtrls.Disable();
         }
 
@@ -69,6 +71,7 @@ namespace YuukiDev.Input
                 if (context.performed) IsSpeedingUp = true;
                 if (context.canceled) IsSpeedingUp = false;
             }
+            Debug.Log(context.performed);
         }
 
         // Right mouse & right shoulder
@@ -84,6 +87,7 @@ namespace YuukiDev.Input
                 if (context.performed) IsSlowingDown = true;
                 if (context.canceled) IsSlowingDown = false;
             }
+            Debug.Log(context.performed);
         }
     }
 }
