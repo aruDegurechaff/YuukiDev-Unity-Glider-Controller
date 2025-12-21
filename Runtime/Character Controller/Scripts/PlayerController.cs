@@ -32,15 +32,24 @@ namespace YuukiDev.Controller
         [SerializeField] private float controlHardnessFast = 0.55f;
         [SerializeField] private float controlSoftnessSlow = 1.35f;
 
+        [Header("Speed Boost")]
+        [SerializeField] private float boostCapacity = 100f;
+        [SerializeField] private float boostRegen = 10f;
+        [SerializeField] private float drainRate = 20f;
+
+
         private Rigidbody rb;
         private YuukiPlayerInput input;
         private Transform camPivot;
 
         private float currentSpeed;
+        private float currentBoost;
         private float bank;
         private Vector3 smoothVel;
 
+        // Read Only
         public float MaxSpeed => maxSpeed;
+        public float BoostNormalized => currentBoost / boostCapacity;
 
         private void Awake()
         {
@@ -51,16 +60,13 @@ namespace YuukiDev.Controller
                 camPivot = Camera.main.transform.parent;
 
             currentSpeed = baseSpeed;
-        }
-
-        private void Update()
-        {
-            HandleRotation();
+            currentBoost = boostCapacity;
         }
 
         private void FixedUpdate()
         {
             HandleGlideMovement();
+            HandleRotation();
         }
 
         //  GLIDING PHYSICS
@@ -75,22 +81,49 @@ namespace YuukiDev.Controller
             float pitchAccel = Mathf.Sin(pitchRad) * thrustFactor;
             currentSpeed += pitchAccel * Time.fixedDeltaTime;
 
-            // Speedup / Slowdown input
-            float targetSpeed = baseSpeed;
+            // Natural air drag on speed (always)
+            float naturalDrag = dragCurve.Evaluate(currentSpeed / maxSpeed);
+            currentSpeed -= naturalDrag * Time.fixedDeltaTime;
 
-            if (input.IsSpeedingUp)
+            // Player-controlled speed assist (ONLY when pressing)
+            if (input.IsSpeedingUp && currentBoost > 0f)
             {
-                targetSpeed = baseSpeed * speedUpMultiplier;  // Burst of speed
-                Debug.Log(targetSpeed);
+                ConsumeBoosters();
+
+                // Makes it so you accelerate towards the max speed
+                float tempSpeed = currentSpeed / maxSpeed;
+                float targetSpeed = Mathf.Lerp(
+                    baseSpeed * speedUpMultiplier,
+                    maxSpeed,
+                    tempSpeed
+                );
+
+                float boostFactor = currentBoost / boostCapacity;
+                float effectiveAcceleration = acceleration * boostFactor;
+
+                currentSpeed = Mathf.MoveTowards(
+                    currentSpeed,
+                    targetSpeed,
+                    effectiveAcceleration * Time.fixedDeltaTime
+                );
             }
             else if (input.IsSlowingDown)
             {
-                targetSpeed = baseSpeed * slowDownMultiplier; // Slow glide
-                Debug.Log(targetSpeed);
+                float targetSpeed = baseSpeed * slowDownMultiplier;
+                currentSpeed = Mathf.MoveTowards(
+                    currentSpeed,
+                    targetSpeed,
+                    acceleration * Time.fixedDeltaTime
+                );
+            }
+            else if (!input.IsSpeedingUp)
+            {
+                float regenMultiplier = input.IsSlowingDown ? 1.75f : 1f;
+                RegenBoosters(regenMultiplier);
             }
 
-            currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.fixedDeltaTime);
-            currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed); // Keep within limits
+            // Clamp after all changes
+            currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
 
             // Forward movement using current speed
             Vector3 targetForward = transform.forward * currentSpeed;
@@ -113,6 +146,25 @@ namespace YuukiDev.Controller
                 ref smoothVel,
                 0.15f
             );
+        }
+
+        public void ConsumeBoosters()
+        {
+            // Consume boost
+            currentBoost -= Time.fixedDeltaTime * drainRate;
+            currentBoost = Mathf.Max(currentBoost, 0f);
+
+            Debug.Log($"[Consume] Boost: {currentBoost:F2}");
+        }
+
+        public float RegenBoosters(float Multiplier)
+        {
+            // Regen Boosters
+            currentBoost += (boostRegen * Multiplier) * Time.fixedDeltaTime;
+            currentBoost = Mathf.Min(currentBoost, boostCapacity);
+
+            Debug.Log($"[Consume] Boost: {currentBoost:F2}");
+            return currentBoost;
         }
 
         // ROTATION & BANKING
@@ -150,7 +202,5 @@ namespace YuukiDev.Controller
                 rotationSpeed * Time.deltaTime
             );
         }
-
-
     }
 }

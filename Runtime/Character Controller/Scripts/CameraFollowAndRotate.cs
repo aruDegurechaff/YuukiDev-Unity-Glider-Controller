@@ -150,12 +150,16 @@ namespace YuukiDev.Controller
         {
             float targetFOV = baseFOV;
 
-            if (input.IsSpeedingUp)
-                targetFOV += fovBoostAmount; // add fixed boost
+            if (input.IsSpeedingUp && playerController.BoostNormalized > 0f)
+            {
+                float boostFactor = playerController.BoostNormalized;
+                targetFOV += fovBoostAmount * boostFactor;
+            }
             else if (input.IsSlowingDown)
-                targetFOV -= fovSlowAmount;  // subtract fixed amount
+            {
+                targetFOV -= fovSlowAmount;
+            }
 
-            // Smoothly update FOV
             cam.fieldOfView = Mathf.SmoothDamp(
                 cam.fieldOfView,
                 targetFOV,
