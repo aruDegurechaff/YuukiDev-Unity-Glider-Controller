@@ -486,9 +486,9 @@ MonoBehaviour:
   slowDownMultiplier: 0.65
   controlHardnessFast: 0.5
   controlSoftnessSlow: 1.25
-  boostCapacity: 100
-  boostRegen: 10
-  drainRate: 20
+  regenDelay: 0.25
+  boostSettings: {fileID: 11400000, guid: cfa1c80e95020d04187a318fa69a5dc7, type: 2}
+  canBoost: 1
 --- !u!114 &128141086200036689
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,13 +1,13 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using YuukiDev.Input;
+using static YuukiDev.Input.IGlideState;
 
 namespace YuukiDev.Controller
 {
     [DefaultExecutionOrder(-1)]
     public class PlayerController : MonoBehaviour
     {
+        #region Variables
         [Header("Glide Speeds")]
         [SerializeField] private float baseSpeed = 3f;
         [SerializeField] private float maxSpeed = 45f;
@@ -33,10 +33,8 @@ namespace YuukiDev.Controller
         [SerializeField] private float controlSoftnessSlow = 1.35f;
 
         [Header("Speed Boost")]
-        [SerializeField] private float boostCapacity = 100f;
-        [SerializeField] private float boostRegen = 10f;
-        [SerializeField] private float drainRate = 20f;
-
+        [SerializeField] private float regenDelay = 0.25f;
+        [SerializeField] private BoostSettings boostSettings;
 
         private Rigidbody rb;
         private YuukiPlayerInput input;
@@ -44,13 +42,24 @@ namespace YuukiDev.Controller
 
         private float currentSpeed;
         private float currentBoost;
+        private float regenTimer = 0f;
         private float bank;
         private Vector3 smoothVel;
 
-        // Read Only
-        public float MaxSpeed => maxSpeed;
-        public float BoostNormalized => currentBoost / boostCapacity;
+        private IGlideState currentState;
 
+        private BoostingGlideState boostingState;
+        private SlowGlideState slowState;
+        public NormalGlideState NormalState;
+        public bool canBoost = true;
+
+        // Read Only... Use when you need a reference for something.
+        public float MaxSpeed => maxSpeed;
+        public float BoostNormalized => currentBoost / boostSettings.capacity;
+        public float CurrentBoost => currentBoost;
+        #endregion
+
+        #region Updates and Init
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
@@ -60,17 +69,50 @@ namespace YuukiDev.Controller
                 camPivot = Camera.main.transform.parent;
 
             currentSpeed = baseSpeed;
-            currentBoost = boostCapacity;
+            currentBoost = boostSettings.capacity;
+
+            NormalState = new NormalGlideState();
+            boostingState = new BoostingGlideState();
+            slowState = new SlowGlideState();
+
+            SwitchState(NormalState);
+
         }
 
         private void FixedUpdate()
         {
-            HandleGlideMovement();
+            UpdateState();
+            currentState.Tick(this);
             HandleRotation();
         }
 
-        //  GLIDING PHYSICS
-        private void HandleGlideMovement()
+        #endregion
+
+        #region State stuff
+        // Helper
+        public void SwitchState(IGlideState newState)
+        {
+            currentState?.Exit(this);
+            currentState = newState;
+            currentState.Enter(this);
+        }
+
+        // State Selector
+        private void UpdateState()
+        {
+            IGlideState targetState =
+                input.IsSpeedingUp && canBoost ? boostingState :
+                input.IsSlowingDown ? slowState :
+                NormalState;
+
+            if (targetState != currentState)
+                SwitchState(targetState);
+        }
+        #endregion
+
+        #region Movement
+        // Physics
+        public void ApplyNaturalMovement()
         {
             // Pitch as -180 to 180
             float pitch = transform.eulerAngles.x;
@@ -84,43 +126,6 @@ namespace YuukiDev.Controller
             // Natural air drag on speed (always)
             float naturalDrag = dragCurve.Evaluate(currentSpeed / maxSpeed);
             currentSpeed -= naturalDrag * Time.fixedDeltaTime;
-
-            // Player-controlled speed assist (ONLY when pressing)
-            if (input.IsSpeedingUp && currentBoost > 0f)
-            {
-                ConsumeBoosters();
-
-                // Makes it so you accelerate towards the max speed
-                float tempSpeed = currentSpeed / maxSpeed;
-                float targetSpeed = Mathf.Lerp(
-                    baseSpeed * speedUpMultiplier,
-                    maxSpeed,
-                    tempSpeed
-                );
-
-                float boostFactor = currentBoost / boostCapacity;
-                float effectiveAcceleration = acceleration * boostFactor;
-
-                currentSpeed = Mathf.MoveTowards(
-                    currentSpeed,
-                    targetSpeed,
-                    effectiveAcceleration * Time.fixedDeltaTime
-                );
-            }
-            else if (input.IsSlowingDown)
-            {
-                float targetSpeed = baseSpeed * slowDownMultiplier;
-                currentSpeed = Mathf.MoveTowards(
-                    currentSpeed,
-                    targetSpeed,
-                    acceleration * Time.fixedDeltaTime
-                );
-            }
-            else if (!input.IsSpeedingUp)
-            {
-                float regenMultiplier = input.IsSlowingDown ? 1.75f : 1f;
-                RegenBoosters(regenMultiplier);
-            }
 
             // Clamp after all changes
             currentSpeed = Mathf.Clamp(currentSpeed, minSpeed, maxSpeed);
@@ -148,25 +153,6 @@ namespace YuukiDev.Controller
             );
         }
 
-        public void ConsumeBoosters()
-        {
-            // Consume boost
-            currentBoost -= Time.fixedDeltaTime * drainRate;
-            currentBoost = Mathf.Max(currentBoost, 0f);
-
-            Debug.Log($"[Consume] Boost: {currentBoost:F2}");
-        }
-
-        public float RegenBoosters(float Multiplier)
-        {
-            // Regen Boosters
-            currentBoost += (boostRegen * Multiplier) * Time.fixedDeltaTime;
-            currentBoost = Mathf.Min(currentBoost, boostCapacity);
-
-            Debug.Log($"[Consume] Boost: {currentBoost:F2}");
-            return currentBoost;
-        }
-
         // ROTATION & BANKING
         private void HandleRotation()
         {
@@ -176,9 +162,9 @@ namespace YuukiDev.Controller
 
             // Harder to control when speeding up / softer when slowing down
             if (input.IsSpeedingUp)
-                controlFactor = controlHardnessFast;      // Reduced steering power
+                controlFactor = controlHardnessFast;    // Reduced steering power
             else if (input.IsSlowingDown)
-                controlFactor = controlSoftnessSlow;      // Increased steering power
+                controlFactor = controlSoftnessSlow;    // Increased steering power
 
             float adjustedBankStrength = bankStrength * controlFactor;
 
@@ -202,5 +188,68 @@ namespace YuukiDev.Controller
                 rotationSpeed * Time.deltaTime
             );
         }
+
+        public void ConsumeBoosters()
+        {
+            currentBoost -= boostSettings.drainRate * Time.fixedDeltaTime;
+            currentBoost = Mathf.Max(currentBoost, 0f);
+
+            // Reset regen cooldown whenever boost is used
+            regenTimer = regenDelay;
+        }
+
+        public void RegenBoosters(float multiplier)
+        {
+            float normalized = Mathf.Max(currentBoost / boostSettings.capacity, 0.01f);
+            float curveValue = boostSettings.regenCurve.Evaluate(normalized);
+
+            float speedFactor = currentSpeed / baseSpeed; // normalized movement influence
+
+            // In this version the regen is also faster the faster the character naturally moves... High risk, high reward.
+            float regenAmount =
+                Mathf.Max(curveValue, 0f) *
+                boostSettings.regenRate *
+                multiplier *
+                speedFactor *
+                Time.fixedDeltaTime;
+
+            currentBoost = Mathf.Clamp(currentBoost + regenAmount, 0f, boostSettings.capacity);
+
+            // Re-enable boosting once enough has regenerated
+            if (currentBoost > 0.1f)
+                canBoost = true;
+        }
+
+
+        public void ApplyBoostAcceleration()
+        {
+            // Makes it so you accelerate towards the max speed
+            float tempSpeed = currentSpeed / maxSpeed;
+            float targetSpeed = Mathf.Lerp(
+                baseSpeed * speedUpMultiplier,
+                maxSpeed,
+                tempSpeed
+            );
+
+            float boostFactor = currentBoost / boostSettings.capacity;
+            float effectiveAcceleration = acceleration * boostFactor;
+
+            currentSpeed = Mathf.MoveTowards(
+                currentSpeed,
+                targetSpeed,
+                effectiveAcceleration * Time.fixedDeltaTime
+            );
+        }
+
+        public void ApplySlowDown()
+        {
+            float targetSpeed = baseSpeed * slowDownMultiplier;
+            currentSpeed = Mathf.MoveTowards(
+                currentSpeed,
+                targetSpeed,
+                acceleration * Time.fixedDeltaTime
+            );
+        }
+        #endregion
     }
 }

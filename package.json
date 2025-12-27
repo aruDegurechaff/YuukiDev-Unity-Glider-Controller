@@ -1,6 +1,6 @@
 {
   "name": "com.yuukidev.glidercontroller",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "displayName": "YuukiDev Glider Controller",
   "description": "This a Glider Controller for an infinite glider game.",
   "unity": "6000.2",
