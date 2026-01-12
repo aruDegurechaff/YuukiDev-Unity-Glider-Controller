@@ -484,9 +484,9 @@ MonoBehaviour:
   bankReturnSpeed: 1
   speedUpMultiplier: 1.8
   slowDownMultiplier: 0.65
-  controlHardnessFast: 0.5
+  controlHardnessFast: 1.25
   controlSoftnessSlow: 1.25
-  regenDelay: 0.25
+  regenDelay: 1.25
   boostSettings: {fileID: 11400000, guid: cfa1c80e95020d04187a318fa69a5dc7, type: 2}
   canBoost: 1
 --- !u!114 &128141086200036689

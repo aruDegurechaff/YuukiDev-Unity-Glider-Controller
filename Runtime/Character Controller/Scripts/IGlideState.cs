@@ -39,8 +39,6 @@ namespace YuukiDev.Input
             {
                 if (player.CurrentBoost <= 0f)
                 {
-                    // Switch to normal glide state to allow regen
-                    player.SwitchState(player.NormalState);
                     return;
                 }
 

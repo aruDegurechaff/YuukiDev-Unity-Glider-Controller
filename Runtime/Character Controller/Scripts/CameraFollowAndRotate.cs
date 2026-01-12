@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;
 using YuukiDev.Input;
 using YuukiDev.OtherScripts;
+using static YuukiDev.Input.IGlideState;
 
 namespace YuukiDev.Controller
 {
@@ -62,6 +62,7 @@ namespace YuukiDev.Controller
         public float rotationSmoothTime = 0.02f;
 
         private Vector2 lookInput;
+        private IGlideState currentState;
 
         public void SetLookInput(Vector2 input)
         {
@@ -150,9 +151,9 @@ namespace YuukiDev.Controller
         {
             float targetFOV = baseFOV;
 
-            if (input.IsSpeedingUp && playerController.BoostNormalized > 0f)
+            if (input.IsSpeedingUp && playerController.canBoost)
             {
-                float boostFactor = playerController.BoostNormalized;
+                float boostFactor = Mathf.SmoothStep(0f, 1f, playerController.BoostNormalized);
                 targetFOV += fovBoostAmount * boostFactor;
             }
             else if (input.IsSlowingDown)

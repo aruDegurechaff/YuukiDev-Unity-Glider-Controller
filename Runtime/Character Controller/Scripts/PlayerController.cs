@@ -196,6 +196,9 @@ namespace YuukiDev.Controller
 
             // Reset regen cooldown whenever boost is used
             regenTimer = regenDelay;
+
+            if (currentBoost > 0f)
+                canBoost = false;
         }
 
         public void RegenBoosters(float multiplier)
@@ -216,7 +219,7 @@ namespace YuukiDev.Controller
             currentBoost = Mathf.Clamp(currentBoost + regenAmount, 0f, boostSettings.capacity);
 
             // Re-enable boosting once enough has regenerated
-            if (currentBoost > 0.1f)
+            if (currentBoost > 0f)
                 canBoost = true;
         }
 
