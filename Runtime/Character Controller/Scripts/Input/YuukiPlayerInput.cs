@@ -48,8 +48,11 @@ namespace YuukiDev.Input
             var device = context.control.device;
             usingController = device is Gamepad;
 
-            cameraFollow.SetDevice(usingController);
-            cameraFollow.SetLookInput(LookInput);
+            if (cameraFollow != null)
+            {
+                cameraFollow.SetDevice(usingController);
+                cameraFollow.SetLookInput(LookInput);
+            }
         }
 
         // NEW SPEEDUP & SLOWDOWN INPUTS
@@ -71,7 +74,6 @@ namespace YuukiDev.Input
                 if (context.performed) IsSpeedingUp = true;
                 if (context.canceled) IsSpeedingUp = false;
             }
-            Debug.Log(context.performed);
         }
 
         // Right mouse & right shoulder
@@ -87,7 +89,6 @@ namespace YuukiDev.Input
                 if (context.performed) IsSlowingDown = true;
                 if (context.canceled) IsSlowingDown = false;
             }
-            Debug.Log(context.performed);
         }
     }
 }

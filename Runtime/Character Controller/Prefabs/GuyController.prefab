@@ -52,7 +52,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1.8
+  m_Radius: 3.52
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3399435062770666144
 MonoBehaviour:
@@ -119,7 +119,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 2.2
+  m_Radius: 4.94
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &8887030066008218644
 MonoBehaviour:
@@ -250,7 +250,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -281,6 +281,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1000696380237149782}
   - component: {fileID: 6114682495799435009}
+  - component: {fileID: 1186403809540787669}
   m_Layer: 0
   m_Name: cameraPivot
   m_TagString: Untagged
@@ -330,14 +331,44 @@ MonoBehaviour:
   sensitivity: 1
   maxVerticalAngle: 80
   maxHorizontalAngle: 160
-  controllerSensitivity: 1
-  mouseSensitivity: 0.05
+  controllerSensitivity: 2.02
+  mouseSensitivity: 0.08
   controllerDeadzone: 0.15
   baseOffset: {x: 0, y: 0, z: 0}
   mouseOffsetAmount: 0.2
   controllerOffsetAmount: 0.25
   offsetSpeed: 0.5
   rotationSmoothTime: 0.02
+--- !u!114 &1186403809540787669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5934267782797622690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 745d25db806fde34782ceedb8ff26deb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YuukiDev.CharacterController::YuukiDev.OtherScripts.CameraProximityVfxController
+  targetCamera: {fileID: 3679262287172411889}
+  player: {fileID: 178746322444165843}
+  proximityChecker: {fileID: 7102337410439006495}
+  targetVolume: {fileID: 0}
+  referenceResolveInterval: 0.5
+  forceEnableCameraPostProcessing: 1
+  createRuntimeVolumeIfMissing: 1
+  runtimeVolumeObjectName: Camera Runtime VFX Volume
+  runtimeVolumePriority: 100
+  farColor: {r: 0.78, g: 0.95, b: 1, a: 1}
+  farWeight: 0.412
+  midColor: {r: 1, g: 0.88, b: 0.42, a: 1}
+  midWeight: 0.267
+  closeColor: {r: 1, g: 0.35, b: 0.35, a: 1}
+  closeWeight: 0.206
+  maxSaturationBoost: 6.5
+  maxExposureBoost: 0.99
+  blendSpeed: 7.5
 --- !u!1 &6421354742227492741
 GameObject:
   m_ObjectHideFlags: 0
@@ -383,6 +414,8 @@ GameObject:
   - component: {fileID: 128141086200036689}
   - component: {fileID: 7102337410439006495}
   - component: {fileID: 8329608792755059322}
+  - component: {fileID: 6896276465575059614}
+  - component: {fileID: 8496030739296049651}
   m_Layer: 0
   m_Name: GuyController
   m_TagString: Untagged
@@ -418,7 +451,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7655504961183429188}
   serializedVersion: 5
-  m_Mass: 500
+  m_Mass: 499.94
   m_LinearDamping: 1
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -449,18 +482,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a011b1a6baa04b343ba099c16ed50946, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  baseSpeed: 14.5
-  maxSpeed: 500
-  minSpeed: 7
-  acceleration: 7.35
-  liftStrength: 8
-  thrustFactor: 10
+  baseSpeed: 4.5
+  maxSpeed: 125
+  minSpeed: 1.25
+  acceleration: 4.25
+  liftStrength: 1.2
+  thrustFactor: 3
+  diveAccelerationMultiplier: 1.35
+  climbDecelerationMultiplier: 0.9
   dragCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 0
+      time: 0.004501343
+      value: 0.3527527
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -468,8 +503,8 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 1
-      value: 1
+      time: 1.4580231
+      value: 1.8327293
       inSlope: 2
       outSlope: 2
       tangentMode: 0
@@ -479,15 +514,38 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  rotationSpeed: 1
-  bankStrength: 2
+  baseDragMultiplier: 1.23
+  turnDragMultiplier: 1.91
+  lateralDragStrength: 5.82
+  turnInputDeadzone: 0.14
+  enableLowSpeedPaperFall: 1
+  lowSpeedFallStartOffset: 0.45
+  lowSpeedFallStrength: 2.79
+  lowSpeedForwardKeep: 0.358
+  lowSpeedFlutterStrength: 0.65
+  lowSpeedFlutterFrequency: 3.5
+  rotationSpeed: 1.23
+  bankStrength: 2.33
   bankReturnSpeed: 1
-  speedUpMultiplier: 1.8
+  speedUpMultiplier: 1.25
   slowDownMultiplier: 0.65
   controlHardnessFast: 1.25
-  controlSoftnessSlow: 1.25
+  controlSoftnessSlow: 0.22
   regenDelay: 1.25
+  minBoostToStart: 0.5
+  minRegenFromEmpty: 0.12
   boostSettings: {fileID: 11400000, guid: cfa1c80e95020d04187a318fa69a5dc7, type: 2}
+  pickupSpeedPulse: 2
+  pickupBoostRefillPercent: 0.08
+  onlyObstacleCollisionsAreLethal: 1
+  obstacleTag: Obstacle
+  freezeTimeOnGameOver: 1
+  reviveCollisionImmunityDuration: 1
+  revivePhantomGraceDuration: 7
+  dynamicWidthCollider: {fileID: 8300772453464752134}
+  speedUpWidthMultiplier: 0.59
+  slowDownWidthMultiplier: 1.25
+  colliderWidthTransitionSpeed: 1
   canBoost: 1
 --- !u!114 &128141086200036689
 MonoBehaviour:
@@ -528,6 +586,120 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b05503aa2f2ff2f49a731ca26571322c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovementTracker
+--- !u!114 &6896276465575059614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7655504961183429188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5849e9a3ce2c652468bf80c1495df53f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YuukiDev.CharacterController::YuukiDev.OtherScripts.PlayerFeedbackController
+  player: {fileID: 178746322444165843}
+  playerInput: {fileID: 128141086200036689}
+  effectSpawnPoint: {fileID: 0}
+  stateVfxParent: {fileID: 0}
+  glideTrails: []
+  trailColorBySpeed:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  minTrailWidth: 0.12
+  maxTrailWidth: 0.28
+  defaultGlideVfxPrefab: {fileID: 0}
+  speedUpVfxPrefab: {fileID: 0}
+  slowDownVfxPrefab: {fileID: 0}
+  cameraSpeedlineVfx: {fileID: 0}
+  autoResolveCameraSpeedlineVfx: 1
+  speedlineResolveInterval: 1
+  speedlineStartSpeedNormalized: 0.2
+  speedlineMaxRate: 60
+  speedlineResponse: 8
+  speedlineRateProperty: Rate
+  setSpeedlineIntensityProperty: 1
+  speedlineIntensityProperty: Intensity
+  keepSpeedlineAlignedToCamera: 1
+  speedlineForwardOffset: 0.4
+  speedlineScale: {x: 1, y: 1, z: 1}
+  windOrbCollectVfxPrefab: {fileID: 0}
+  graceTokenCollectVfxPrefab: {fileID: 0}
+  lanternSparksCollectVfxPrefab: {fileID: 0}
+  featherSlipCollectVfxPrefab: {fileID: 0}
+  coinCollectVfxPrefab: {fileID: 0}
+  fallbackFxLifetime: 2
+  stateLoopSource: {fileID: 0}
+  defaultGlideLoopClip: {fileID: 0}
+  speedUpLoopClip: {fileID: 0}
+  slowDownLoopClip: {fileID: 0}
+  loopPitchBySpeed: {x: 0.9, y: 1.25}
+  loopVolumeBySpeed: {x: 0.35, y: 0.9}
+  oneShotSource: {fileID: 0}
+  windOrbSfx: {fileID: 0}
+  graceTokenSfx: {fileID: 0}
+  lanternSparksSfx: {fileID: 0}
+  featherSlipSfx: {fileID: 0}
+  coinSfx: {fileID: 0}
+  oneShotVolume: 1
+--- !u!114 &8496030739296049651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7655504961183429188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96ae1bf33f9a70a43a9bbe6933c7cb83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YuukiDev.CharacterController::YuukiDev.OtherScripts.SpeedBoostStaminaUI
+  player: {fileID: 178746322444165843}
+  localOffset: {x: 0.26, y: 0.35, z: 0.56}
+  worldDiameter: 0.18
+  ringTextureSize: 256
+  ringInnerRadius: 0.877
+  sortingOrder: 20
+  billboardToCamera: 1
+  billboardSmooth: 14
+  hideWhenFullAndIdle: 1
+  fullHideThreshold: 0.995
+  fadeSpeed: 1
+  showLabel: 0
+  labelText: Stamina
+  fontSize: 22
+  frameColor: {r: 0, g: 0, b: 0, a: 0.85}
+  backgroundColor: {r: 0.06, g: 0.09, b: 0.14, a: 0.85}
+  fillLowColor: {r: 0.97, g: 0.3, b: 0.25, a: 1}
+  fillHighColor: {r: 0.32, g: 0.95, b: 0.78, a: 1}
+  textColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &8214388183272678697
 GameObject:
   m_ObjectHideFlags: 0
@@ -580,7 +752,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1.35
+  m_Radius: 2.66
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3429614956967395523
 MonoBehaviour:
@@ -687,5 +859,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.6541619, y: 1.7822521, z: 0.073646694}
-  m_Center: {x: 0, y: 0.8910891, z: 0.008060613}
+  m_Size: {x: 0.67, y: 1.01, z: 0.007}
+  m_Center: {x: 0, y: 1.03, z: 0.008060613}

@@ -1,8 +1,8 @@
 {
   "name": "com.yuukidev.glidercontroller",
-  "version": "2.3.1",
+  "version": "3.0.0",
   "displayName": "YuukiDev Glider Controller",
-  "description": "This a Glider Controller for an infinite glider game.",
+  "description": "Glider controller for infinite flight with power-ups and scoring.",
   "unity": "6000.2",
   "unityRelease": "10f1",
   "documentationUrl": "idk",
@@ -19,7 +19,7 @@
   ],
   "author": {
     "name": "Aldreck Paul L. Obenario",
-    "email": "aldreckdegurechaff@gmail.com",
-    "url": "https://arudegurechaff.github.io/aruDegurechaff.portfolio.github.io/"
+    "url": "https://arudegurechaff.github.io/aruDegurechaff.portfolio.github.io/",
+    "email": "aldreckdegurechaff@gmail.com"
   }
 }

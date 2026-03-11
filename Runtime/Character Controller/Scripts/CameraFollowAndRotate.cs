@@ -24,11 +24,16 @@ namespace YuukiDev.Controller
 
         [Header("FOV Settings")]
         public float baseFOV = 60f;
+        [SerializeField] private float speedFovRange = 12f;
+        [SerializeField] private float maxFOV = 90f;
         [SerializeField] private float fovBoostAmount = 10f; // how much FOV changes on speed-up
         [SerializeField] private float fovSlowAmount = 5f;   // how much FOV changes on slow-down
         [SerializeField] private float fovSmoothTime = 0.08f;
 
         private float fovVelocity;
+        private float temporaryFovBoost = 0f;
+        private float temporaryFovTimer = 0f;
+        private float temporaryFovDuration = 0f;
 
         [Header("Rotation Settings")]
         public float sensitivity = 0.25f;
@@ -74,11 +79,31 @@ namespace YuukiDev.Controller
             isController = controller;
         }
 
+        private void Awake()
+        {
+            if (cam == null)
+                cam = GetComponentInChildren<Camera>();
+
+            if (cam != null && baseFOV <= 0f)
+                baseFOV = cam.fieldOfView;
+        }
+
+        public void TriggerTemporaryFovBoost(float extraFov, float duration)
+        {
+            if (extraFov <= 0f || duration <= 0f)
+                return;
+
+            temporaryFovBoost = Mathf.Max(temporaryFovBoost, extraFov);
+            temporaryFovTimer = Mathf.Max(temporaryFovTimer, duration);
+            temporaryFovDuration = Mathf.Max(temporaryFovDuration, duration);
+        }
+
         private void LateUpdate()
         {
             FollowTarget();
             RotateCamera();
 
+            UpdateTemporaryFovBoost();
             FOVDynamicUpdate();
         }
 
@@ -149,17 +174,37 @@ namespace YuukiDev.Controller
 
         private void FOVDynamicUpdate()
         {
+            if (cam == null)
+                return;
+
             float targetFOV = baseFOV;
 
-            if (input.IsSpeedingUp && playerController.canBoost)
+            if (playerController != null)
             {
-                float boostFactor = Mathf.SmoothStep(0f, 1f, playerController.BoostNormalized);
-                targetFOV += fovBoostAmount * boostFactor;
+                float speedFactor = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(playerController.SpeedNormalized));
+                targetFOV += Mathf.Max(0f, speedFovRange) * speedFactor;
+
+                if (playerController.CurrentGlideMode == PlayerController.GlideMode.SpeedingUp && playerController.CurrentBoost > 0f)
+                {
+                    // Keep boost FOV visible immediately, then scale stronger as speed ramps up.
+                    float boostVisualFactor = Mathf.Lerp(0.55f, 1f, speedFactor);
+                    targetFOV += fovBoostAmount * boostVisualFactor;
+                }
+                else if (playerController.CurrentGlideMode == PlayerController.GlideMode.SlowingDown)
+                {
+                    float slowFactor = 1f - speedFactor;
+                    targetFOV -= fovSlowAmount * Mathf.Lerp(0.45f, 1f, slowFactor);
+                }
             }
-            else if (input.IsSlowingDown)
+
+            if (temporaryFovTimer > 0f)
             {
-                targetFOV -= fovSlowAmount;
+                float fade = Mathf.Clamp01(temporaryFovTimer / Mathf.Max(temporaryFovDuration, 0.01f));
+                targetFOV += temporaryFovBoost * fade;
             }
+
+            float effectiveMaxFov = Mathf.Max(maxFOV, baseFOV);
+            targetFOV = Mathf.Min(targetFOV, effectiveMaxFov);
 
             cam.fieldOfView = Mathf.SmoothDamp(
                 cam.fieldOfView,
@@ -167,6 +212,20 @@ namespace YuukiDev.Controller
                 ref fovVelocity,
                 fovSmoothTime
             );
+        }
+
+        private void UpdateTemporaryFovBoost()
+        {
+            if (temporaryFovTimer <= 0f)
+                return;
+
+            temporaryFovTimer -= Time.deltaTime;
+            if (temporaryFovTimer <= 0f)
+            {
+                temporaryFovTimer = 0f;
+                temporaryFovBoost = 0f;
+                temporaryFovDuration = 0f;
+            }
         }
     }
 }

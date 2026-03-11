@@ -10,6 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 622080145902398912}
   - component: {fileID: 6795396634133435926}
+  - component: {fileID: 5028972704756677819}
+  - component: {fileID: 4930332780037555091}
+  - component: {fileID: 810967336995068488}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -45,3 +48,112 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: YuukiDev.CharacterController::CursorManager
   hideCursor: 1
+--- !u!114 &5028972704756677819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6177152365943363882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e02d855703900489bc107eb96800f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
+  distanceText: {fileID: 0}
+  HighScoreText: {fileID: 0}
+  distanceScore: 0
+  activePowerUpMultiplier: 1
+  powerUpTimer: 0
+  gameOverText: {fileID: 0}
+  reviveButton: {fileID: 0}
+  playAgainButton: {fileID: 0}
+  enableRevive: 1
+  baseReviveScoreCost: 500
+  reviveCostText: {fileID: 0}
+  reviveMessageDuration: 1.2
+  respawnAnchor: {fileID: 0}
+  spawnPlayerAtAnchorOnStart: 1
+  playerPrefab: {fileID: 178746322444165843, guid: 0652d5f6c8d2cf646a271691d2e0f29f, type: 3}
+  dependencyResolveInterval: 0.75
+--- !u!114 &4930332780037555091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6177152365943363882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d0fd5a37e5bfba42ba5c54a20e13cdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YuukiDev.CharacterController::YuukiDev.OtherScripts.PowerUpsSpawnerManager
+  powerUpPrefab: {fileID: 4350812963007078133, guid: f1bc91cccf7d4f340a6380c72b827eee, type: 3}
+  spawnOnEnable: 1
+  minSpawnInterval: 3
+  maxSpawnInterval: 6
+  maxActivePowerUps: 12
+  windOrbWeight: 3
+  graceTokenWeight: 3
+  lanternSparksWeight: 2
+  featherSlipWeight: 1
+  playerTarget: {fileID: 0}
+  fallbackAnchor: {fileID: 0}
+  autoResolvePlayerTarget: 1
+  targetResolveInterval: 0.5
+  minForwardDistance: 60
+  maxForwardDistance: 300
+  sideSpread: 20
+  verticalSpread: 10
+  verticalOffset: 2
+  dynamicDistanceBySpeed: 1
+  closeDistanceMultiplier: 0.6
+  farDistanceMultiplier: 1.6
+  maxPlacementAttempts: 5
+  obstacleTag: Obstacle
+  overlapCheckRadius: 1
+  overlapCheckMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  triggerInteraction: 1
+  overlapBufferSize: 32
+--- !u!114 &810967336995068488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6177152365943363882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93e757ed9d76ae14e8958adaab75ca71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YuukiDev.CharacterController::YuukiDev.OtherScripts.CoinsSpawnerManager
+  coinPrefab: {fileID: 5008823078730612190, guid: 307ace5a8527b404b95edeb4609e22d6, type: 3}
+  spawnOnEnable: 1
+  minSpawnInterval: 1
+  maxSpawnInterval: 3
+  maxActiveCoins: 40
+  dynamicSpawnRateBySpeed: 1
+  slowSpeedIntervalMultiplier: 1.35
+  fastSpeedIntervalMultiplier: 0.7
+  playerTarget: {fileID: 0}
+  fallbackAnchor: {fileID: 0}
+  autoResolvePlayerTarget: 1
+  targetResolveInterval: 0.5
+  minForwardDistance: 90
+  maxForwardDistance: 220
+  sideSpread: 40
+  verticalSpread: 20
+  verticalOffset: 1.5
+  dynamicDistanceBySpeed: 1
+  closeDistanceMultiplier: 0.6
+  farDistanceMultiplier: 1.6
+  maxPlacementAttempts: 20
+  obstacleTag: Obstacle
+  overlapCheckRadius: 0.75
+  overlapCheckMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  triggerInteraction: 1
+  overlapBufferSize: 32

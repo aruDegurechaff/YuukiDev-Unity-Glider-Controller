@@ -1,34 +1,53 @@
 # YuukiDev Glider Controller
 
-*By Aldreck Paul L. Obenario — YuukiDev*
+By Aldreck Paul L. Obenario (YuukiDev)
 
-A lightweight, modular glider controller for Unity projects. Designed to be drop-in for prototyping or as a packaged module for your game. It groups runtime logic into a single assembly for faster incremental compilation and keeps editor tools separated.
+A modular glider controller package for infinite flight games. Includes movement, power-ups, scoring, and proximity-based feedback systems.
 
 ---
 
 ## Features
-- Smooth gliding movement and input mapping
-- Modular design suitable for packaging as a Unity Package
-- Single runtime assembly (`YuukiDev.Glider`) and optional Editor assembly
-- Simple, easy-to-read C# scripts meant for extension
+- Smooth gliding movement with boost and slow states
+- Low-speed fall behavior and dynamic drag tuning
+- Power-ups: Wind Orb, Phantom Grace, Lantern Sparks, Feather Slip
+- Coin collectibles with dynamic spawners
+- Proximity graze system for scoring and camera feedback
+- Stamina UI and power-up buff UI helpers
+- Game over and revive flow
 
 ---
 
 ## Requirements
-- Unity (recommended: 2021.3 LTS or newer)
-- C# 8.0+ (depends on your Unity version)
-- No external runtime dependencies by default
-
-> If your project uses different or additional packages, add them to `package.json` or the assembly definition (`.asmdef`) references.
+- Unity 6000.2 or newer
+- Input System 1.7.0 (package dependency)
+- URP is required only if you use the camera proximity VFX
 
 ---
 
 ## Installation
 
-### Local (during development)
-1. Copy the `YuukiDev` folder into your project `Assets/` folder, or
-2. Place the package folder into `Packages/` and reference it in `manifest.json` with a `file:` path.
+### Local (embedded)
+1. Place the package folder under `Packages/`
+2. Or add a `file:` reference in `Packages/manifest.json`
 
-Example `manifest.json` entry (local):
+Example `manifest.json` entry:
 ```json
-"com.yuukidev.glider": "file:../path/to/YuukiDevGlider"
+"com.yuukidev.glidercontroller": "file:../path/to/YuukiDev Glider"
+```
+
+---
+
+## Quick Start
+1. Create a player object with `PlayerController`, `Rigidbody`, `Collider`, and `YuukiPlayerInput`. Or just use the 'GuyController' prefab in the prefabs folder.
+2. Add `CameraFollowAndRotate` to your camera rig and assign the player target.
+3. Add `MovementTracker` and `ProximityChecker` to the player object.
+4. Add `ScoreManager` to a scene object and assign UI references.
+5. Add `CoinsSpawnerManager` and `PowerUpsSpawnerManager` and set the player target (or enable auto-resolve).
+6. Optional UI helpers: `SpeedBoostStaminaUI` and `PowerUpBuffFadeUI`.
+
+---
+
+## Notes
+- Power-ups and coins auto-despawn when far from the player.
+- Phantom Grace ignores obstacle collisions while preserving proximity triggers.
+- Proximity VFX disables while Phantom Grace is active.
