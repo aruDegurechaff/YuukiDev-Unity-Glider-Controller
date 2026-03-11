@@ -1,6 +1,6 @@
 {
   "name": "com.yuukidev.glidercontroller",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "displayName": "YuukiDev Glider Controller",
   "description": "Glider controller for infinite flight with power-ups and scoring.",
   "unity": "6000.2",
@@ -9,7 +9,9 @@
   "changelogUrl": "idk",
   "licensesUrl": "idk",
   "dependencies": {
-    "com.unity.inputsystem": "1.7.0"
+    "com.unity.inputsystem": "1.7.0",
+    "com.unity.textmeshpro": "3.0.6",
+    "com.unity.ugui": "2.0.0"
   },
   "keywords": [
     "yuukidev",
