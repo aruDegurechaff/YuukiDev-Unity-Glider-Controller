@@ -6,6 +6,12 @@ using YuukiDev.Controller;
 
 namespace YuukiDev.OtherScripts
 {
+    /*
+     * Power-up spawning manager
+     * by: YuukiDev
+     *
+     * Spawns weighted power-ups with obstacle-safe placement.
+     */
     public class PowerUpsSpawnerManager : MonoBehaviour
     {
         [Header("Prefab")]

@@ -2,6 +2,12 @@ using UnityEngine;
 
 namespace YuukiDev.OtherScripts
 {
+    /*
+     * Range trigger relay
+     * by: YuukiDev
+     *
+     * Sends proximity enter/exit events to the main checker.
+     */
     public class RangeTrigger : MonoBehaviour
     {
         public string rangeType; // "Close" / "Mid" / "Far"

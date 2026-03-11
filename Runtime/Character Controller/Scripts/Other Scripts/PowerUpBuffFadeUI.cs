@@ -4,6 +4,12 @@ using YuukiDev.Controller;
 
 namespace YuukiDev.OtherScripts
 {
+    /*
+     * Power-up buff UI
+     * by: YuukiDev
+     *
+     * Fades an icon in local space based on remaining buff time.
+     */
     [DisallowMultipleComponent]
     public class PowerUpBuffFadeUI : MonoBehaviour
     {

@@ -5,6 +5,12 @@ using UnityEngine;
  */
 namespace YuukiDev.OtherScripts
 {
+    /*
+     * Proximity state collector
+     * by: YuukiDev
+     *
+     * Tracks graze ranges and exposes simple boolean flags.
+     */
     public class ProximityChecker : MonoBehaviour
     {
         public bool IsClose { get; private set; }

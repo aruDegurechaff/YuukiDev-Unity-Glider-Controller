@@ -5,6 +5,12 @@ using YuukiDev.Controller;
 
 namespace YuukiDev.OtherScripts
 {
+    /*
+     * Coin collectible behavior
+     * by: YuukiDev
+     *
+     * Handles pickup, attraction, spawn animation, and despawn logic.
+     */
     public class CoinCollectible : MonoBehaviour
     {
         [SerializeField] private int coinValue = 25;

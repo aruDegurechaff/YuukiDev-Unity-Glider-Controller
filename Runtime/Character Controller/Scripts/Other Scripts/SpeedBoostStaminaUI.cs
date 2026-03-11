@@ -4,6 +4,12 @@ using YuukiDev.Controller;
 
 namespace YuukiDev.OtherScripts
 {
+    /*
+     * Speed boost stamina UI
+     * by: YuukiDev
+     *
+     * World-space stamina ring that fades based on boost usage.
+     */
     [DisallowMultipleComponent]
     public class SpeedBoostStaminaUI : MonoBehaviour
     {

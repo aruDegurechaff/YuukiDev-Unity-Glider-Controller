@@ -5,6 +5,12 @@ using YuukiDev.Controller;
 
 public class PowerUp : MonoBehaviour
 {
+    /*
+     * Power-up pickup logic
+     * by: YuukiDev
+     *
+     * Applies a specific effect and handles visuals and spawn animation.
+     */
     public enum PowerUpType
     {
         WindOrb,

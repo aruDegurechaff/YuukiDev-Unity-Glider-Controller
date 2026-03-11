@@ -5,6 +5,12 @@ using YuukiDev.Controller;
 
 namespace YuukiDev.OtherScripts
 {
+    /*
+     * Coin spawning manager
+     * by: YuukiDev
+     *
+     * Spawns coins ahead of the player with obstacle-safe placement.
+     */
     public class CoinsSpawnerManager : MonoBehaviour
     {
         [Header("Prefab")]

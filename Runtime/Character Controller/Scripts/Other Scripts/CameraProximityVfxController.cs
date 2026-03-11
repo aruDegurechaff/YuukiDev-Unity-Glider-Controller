@@ -5,6 +5,12 @@ using YuukiDev.Controller;
 
 namespace YuukiDev.OtherScripts
 {
+    /*
+     * Proximity camera feedback
+     * by: YuukiDev
+     *
+     * Drives post-processing color and intensity based on graze ranges.
+     */
     [DisallowMultipleComponent]
     public class CameraProximityVfxController : MonoBehaviour
     {

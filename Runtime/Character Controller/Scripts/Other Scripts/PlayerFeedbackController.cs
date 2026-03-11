@@ -5,6 +5,12 @@ using YuukiDev.Input;
 
 namespace YuukiDev.OtherScripts
 {
+    /*
+     * Player feedback hub
+     * by: YuukiDev
+     *
+     * Orchestrates trails, VFX, and SFX based on player state.
+     */
     [DisallowMultipleComponent]
     public class PlayerFeedbackController : MonoBehaviour
     {

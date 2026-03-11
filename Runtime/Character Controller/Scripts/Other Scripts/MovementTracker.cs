@@ -2,6 +2,12 @@ using UnityEngine;
 
 namespace YuukiDev.OtherScripts
 {
+    /*
+     * Runtime speed tracker
+     * by: YuukiDev
+     *
+     * Provides the current movement speed for scoring and feedback.
+     */
     public class MovementTracker : MonoBehaviour
     {
         private Rigidbody rb;
