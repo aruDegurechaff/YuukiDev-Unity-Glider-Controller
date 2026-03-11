@@ -3,15 +3,18 @@ using YuukiDev.Controller;
 namespace YuukiDev.Input
 {
     /*
-     * This makes the Controller use States 
+     * Glide state interface
+     * by: YuukiDev
+     *
+     * This makes the Controller use States
      * instead of multiple if statements.
      * Makes it less complex and therefore
      * more lightweight.
-     * 
+     *
      * This handles movement inputs which turns them into a state,
      * rather than continously checking if the player is doing something.
      * This is a better scalable alternative.
-    */
+     */
     public interface IGlideState
     {
         void Enter(PlayerController player);

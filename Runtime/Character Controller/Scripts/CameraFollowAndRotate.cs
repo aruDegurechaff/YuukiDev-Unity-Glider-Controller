@@ -5,6 +5,12 @@ using static YuukiDev.Input.IGlideState;
 
 namespace YuukiDev.Controller
 {
+    /*
+     * Camera follow, rotation, and FOV control
+     * by: YuukiDev
+     *
+     * Keeps the view responsive to player speed and input.
+     */
     [DefaultExecutionOrder(-1)]
     public class CameraFollowAndRotate : MonoBehaviour
     {
