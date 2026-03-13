@@ -325,6 +325,8 @@ MonoBehaviour:
   smoothTime: 0.05
   offset: {x: 0, y: 0, z: 0}
   baseFOV: 80
+  speedFovRange: 12
+  maxFOV: 90
   fovBoostAmount: 15
   fovSlowAmount: 5
   fovSmoothTime: 0.25
@@ -416,6 +418,7 @@ GameObject:
   - component: {fileID: 8329608792755059322}
   - component: {fileID: 6896276465575059614}
   - component: {fileID: 8496030739296049651}
+  - component: {fileID: 4027146186488121323}
   m_Layer: 0
   m_Name: GuyController
   m_TagString: Untagged
@@ -700,6 +703,34 @@ MonoBehaviour:
   fillLowColor: {r: 0.97, g: 0.3, b: 0.25, a: 1}
   fillHighColor: {r: 0.32, g: 0.95, b: 0.78, a: 1}
   textColor: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &4027146186488121323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7655504961183429188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0ac1a778a523114db6414ecd8270514, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YuukiDev.CharacterController::YuukiDev.OtherScripts.PowerUpBuffFadeUI
+  player: {fileID: 0}
+  localOffset: {x: 0, y: 2.55, z: 0}
+  worldSize: 0.32
+  sortingOrder: 21
+  billboardToCamera: 1
+  billboardSmooth: 14
+  showWindOrbBuff: 1
+  fadeSpeed: 6
+  windOrbSprite: {fileID: 0}
+  phantomGraceSprite: {fileID: 0}
+  lanternSparksSprite: {fileID: 0}
+  featherSlipSprite: {fileID: 0}
+  windOrbColor: {r: 0.3, g: 0.85, b: 1, a: 1}
+  phantomGraceColor: {r: 0.52, g: 1, b: 1, a: 1}
+  lanternSparksColor: {r: 1, g: 0.74, b: 0.24, a: 1}
+  featherSlipColor: {r: 0.62, g: 1, b: 0.82, a: 1}
 --- !u!1 &8214388183272678697
 GameObject:
   m_ObjectHideFlags: 0
