@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.VFX;
 using YuukiDev.Controller;
-using YuukiDev.Input;
 
 namespace YuukiDev.OtherScripts
 {
@@ -16,19 +15,13 @@ namespace YuukiDev.OtherScripts
     {
         [Header("References")]
         [SerializeField] private PlayerController player;
-        [SerializeField] private YuukiPlayerInput playerInput;
         [SerializeField] private Transform effectSpawnPoint;
         [SerializeField] private Transform stateVfxParent;
 
         [Header("Glide Trail")]
         [SerializeField] private TrailRenderer[] glideTrails;
-        [SerializeField] private Gradient trailColorBySpeed;
-        [SerializeField] private Gradient trailSecondaryColorBySpeed;
         [SerializeField] private float minTrailWidth = 0.12f;
         [SerializeField] private float maxTrailWidth = 0.28f;
-        [SerializeField] private bool driveTrailMaterialColors = true;
-        [SerializeField] private string trailPrimaryColorProperty = "Color01";
-        [SerializeField] private string trailSecondaryColorProperty = "Color02";
         [SerializeField] private Transform[] trailSpawnPoints;
         [SerializeField] private Transform trailSpawnRoot;
         [SerializeField] private bool autoResolveTrailSpawnPoints = true;
@@ -92,16 +85,11 @@ namespace YuukiDev.OtherScripts
         private bool speedlineHasIntensity;
         private float speedlineVisual;
         private float nextSpeedlineResolveTime;
-        private int trailPrimaryColorId;
-        private int trailSecondaryColorId;
-        private MaterialPropertyBlock trailPropertyBlock;
 
         private void Awake()
         {
             if (player == null)
                 player = GetComponent<PlayerController>();
-            if (playerInput == null)
-                playerInput = GetComponent<YuukiPlayerInput>();
 
             if ((glideTrails == null || glideTrails.Length == 0) && player != null)
                 glideTrails = player.GetComponentsInChildren<TrailRenderer>(true);
@@ -117,7 +105,6 @@ namespace YuukiDev.OtherScripts
             ResolveSpeedlineVfx(true);
             if (cameraSpeedlineVfx != null)
                 CacheSpeedlineCapabilities();
-            CacheTrailPropertyIds();
             ResolveTrailSpawnPoints();
         }
 
@@ -593,28 +580,6 @@ namespace YuukiDev.OtherScripts
 
             if (points.Count > 0)
                 trailSpawnPoints = points.ToArray();
-        }
-
-        private void CacheTrailPropertyIds()
-        {
-            trailPrimaryColorId = Shader.PropertyToID(trailPrimaryColorProperty);
-            trailSecondaryColorId = Shader.PropertyToID(trailSecondaryColorProperty);
-            if (trailPropertyBlock == null)
-                trailPropertyBlock = new MaterialPropertyBlock();
-        }
-
-        private void ApplyTrailMaterialColors(TrailRenderer trail, Color primary, Color secondary)
-        {
-            if (trail == null)
-                return;
-
-            if (trailPropertyBlock == null)
-                trailPropertyBlock = new MaterialPropertyBlock();
-
-            trail.GetPropertyBlock(trailPropertyBlock);
-            trailPropertyBlock.SetColor(trailPrimaryColorId, primary);
-            trailPropertyBlock.SetColor(trailSecondaryColorId, secondary);
-            trail.SetPropertyBlock(trailPropertyBlock);
         }
 
     }
