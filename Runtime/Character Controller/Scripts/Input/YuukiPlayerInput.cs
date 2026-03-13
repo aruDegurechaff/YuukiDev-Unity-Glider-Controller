@@ -4,6 +4,12 @@ using YuukiDev.Controller;
 
 namespace YuukiDev.Input
 {
+    /*
+     * Input bridge for camera and movement controls
+     * by: YuukiDev
+     *
+     * Converts input actions into simple state flags for the controller.
+     */
     [DefaultExecutionOrder(-2)]
     public class YuukiPlayerInput : MonoBehaviour, MovementCtrls.ICameraActions, MovementCtrls.IMovementActions
     {

@@ -1,5 +1,11 @@
 using UnityEngine;
 
+/*
+ * Boost settings container
+ * by: YuukiDev
+ *
+ * ScriptableObject tuning data for boost capacity and regen.
+ */
 [CreateAssetMenu(menuName = "Flight/Boost Settings")]
 public class BoostSettings : ScriptableObject
 {

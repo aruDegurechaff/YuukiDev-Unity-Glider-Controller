@@ -23,8 +23,20 @@ namespace YuukiDev.OtherScripts
         [Header("Glide Trail")]
         [SerializeField] private TrailRenderer[] glideTrails;
         [SerializeField] private Gradient trailColorBySpeed;
+        [SerializeField] private Gradient trailSecondaryColorBySpeed;
         [SerializeField] private float minTrailWidth = 0.12f;
         [SerializeField] private float maxTrailWidth = 0.28f;
+        [SerializeField] private bool driveTrailMaterialColors = true;
+        [SerializeField] private string trailPrimaryColorProperty = "Color01";
+        [SerializeField] private string trailSecondaryColorProperty = "Color02";
+        [SerializeField] private Transform[] trailSpawnPoints;
+        [SerializeField] private Transform trailSpawnRoot;
+        [SerializeField] private bool autoResolveTrailSpawnPoints = true;
+        [SerializeField] private string trailSpawnRootName = "Trails";
+        [SerializeField] private string trailSpawnPointNameFilter = "TrailSpawn";
+        [SerializeField] private bool followTrailSpawnPoints = true;
+        [SerializeField] private bool ignorePlayerRollForTrails = true;
+        [SerializeField] private Transform trailForwardReference;
 
         [Header("State VFX")]
         [SerializeField] private GameObject defaultGlideVfxPrefab;
@@ -71,15 +83,18 @@ namespace YuukiDev.OtherScripts
         [SerializeField] private float oneShotVolume = 1f;
 
         private PlayerController.GlideMode currentMode = PlayerController.GlideMode.Normal;
-        private GameObject defaultGlideVfx;
-        private GameObject speedUpVfx;
-        private GameObject slowDownVfx;
+        private GameObject[] defaultGlideVfxInstances;
+        private GameObject[] speedUpVfxInstances;
+        private GameObject[] slowDownVfxInstances;
         private int speedlineRatePropertyId;
         private int speedlineIntensityPropertyId;
         private bool speedlineHasRate;
         private bool speedlineHasIntensity;
         private float speedlineVisual;
         private float nextSpeedlineResolveTime;
+        private int trailPrimaryColorId;
+        private int trailSecondaryColorId;
+        private MaterialPropertyBlock trailPropertyBlock;
 
         private void Awake()
         {
@@ -96,12 +111,14 @@ namespace YuukiDev.OtherScripts
             if (stateVfxParent == null && player != null)
                 stateVfxParent = player.transform;
 
-            defaultGlideVfx = CreateStateVfxInstance(defaultGlideVfxPrefab);
-            speedUpVfx = CreateStateVfxInstance(speedUpVfxPrefab);
-            slowDownVfx = CreateStateVfxInstance(slowDownVfxPrefab);
+            defaultGlideVfxInstances = CreateStateVfxInstances(defaultGlideVfxPrefab);
+            speedUpVfxInstances = CreateStateVfxInstances(speedUpVfxPrefab);
+            slowDownVfxInstances = CreateStateVfxInstances(slowDownVfxPrefab);
             ResolveSpeedlineVfx(true);
             if (cameraSpeedlineVfx != null)
                 CacheSpeedlineCapabilities();
+            CacheTrailPropertyIds();
+            ResolveTrailSpawnPoints();
         }
 
         private void OnEnable()
@@ -139,6 +156,16 @@ namespace YuukiDev.OtherScripts
             UpdateCameraSpeedlineBySpeed();
         }
 
+        private void LateUpdate()
+        {
+            if (player == null)
+                return;
+
+            ResolveTrailSpawnPoints();
+            EnsureTrailReferences();
+            UpdateTrailSpawnPoints();
+        }
+
         private void OnGlideModeChanged(PlayerController.GlideMode mode)
         {
             currentMode = mode;
@@ -147,9 +174,9 @@ namespace YuukiDev.OtherScripts
 
         private void ApplyStateFeedback(PlayerController.GlideMode mode, bool forceAudioRefresh)
         {
-            SetStateVfxActive(defaultGlideVfx, mode == PlayerController.GlideMode.Normal);
-            SetStateVfxActive(speedUpVfx, mode == PlayerController.GlideMode.SpeedingUp);
-            SetStateVfxActive(slowDownVfx, mode == PlayerController.GlideMode.SlowingDown);
+            SetStateVfxActive(defaultGlideVfxInstances, mode == PlayerController.GlideMode.Normal);
+            SetStateVfxActive(speedUpVfxInstances, mode == PlayerController.GlideMode.SpeedingUp);
+            SetStateVfxActive(slowDownVfxInstances, mode == PlayerController.GlideMode.SlowingDown);
 
             RefreshLoopClip(mode, forceAudioRefresh);
         }
@@ -204,13 +231,7 @@ namespace YuukiDev.OtherScripts
                 return;
 
             float speed01 = Mathf.Clamp01(player.SpeedNormalized);
-            Color speedColor = trailColorBySpeed != null
-                ? trailColorBySpeed.Evaluate(speed01)
-                : Color.Lerp(new Color(0.3f, 0.85f, 1f), new Color(1f, 0.35f, 0.15f), speed01);
-
             float width = Mathf.Lerp(minTrailWidth, maxTrailWidth, speed01);
-            Color endColor = speedColor;
-            endColor.a = 0f;
 
             for (int i = 0; i < glideTrails.Length; i++)
             {
@@ -218,8 +239,6 @@ namespace YuukiDev.OtherScripts
                 if (trail == null)
                     continue;
 
-                trail.startColor = speedColor;
-                trail.endColor = endColor;
                 trail.widthMultiplier = width;
             }
         }
@@ -264,9 +283,9 @@ namespace YuukiDev.OtherScripts
             if (deadPlayer != player)
                 return;
 
-            SetStateVfxActive(defaultGlideVfx, false);
-            SetStateVfxActive(speedUpVfx, false);
-            SetStateVfxActive(slowDownVfx, false);
+            SetStateVfxActive(defaultGlideVfxInstances, false);
+            SetStateVfxActive(speedUpVfxInstances, false);
+            SetStateVfxActive(slowDownVfxInstances, false);
 
             if (stateLoopSource != null && stateLoopSource.isPlaying)
                 stateLoopSource.Stop();
@@ -282,7 +301,6 @@ namespace YuukiDev.OtherScripts
 
             Vector3 spawnPos = effectSpawnPoint != null ? effectSpawnPoint.position : transform.position;
             Quaternion spawnRot = effectSpawnPoint != null ? effectSpawnPoint.rotation : Quaternion.identity;
-
             GameObject spawnedFx = Instantiate(fxPrefab, spawnPos, spawnRot);
             float ttl = EstimateVfxLifetime(spawnedFx);
 
@@ -297,15 +315,31 @@ namespace YuukiDev.OtherScripts
             oneShotSource.PlayOneShot(clip, oneShotVolume);
         }
 
-        private GameObject CreateStateVfxInstance(GameObject prefab)
+        private GameObject[] CreateStateVfxInstances(GameObject prefab)
         {
             if (prefab == null)
-                return null;
+                return System.Array.Empty<GameObject>();
 
-            Transform parent = stateVfxParent != null ? stateVfxParent : transform;
+            Transform[] points = (trailSpawnPoints != null && trailSpawnPoints.Length > 0) ? trailSpawnPoints : null;
+            if (points == null)
+                return new[] { CreateStateVfxInstanceAt(prefab, stateVfxParent != null ? stateVfxParent : transform) };
+
+            GameObject[] instances = new GameObject[points.Length];
+            for (int i = 0; i < points.Length; i++)
+            {
+                Transform parent = points[i] != null ? points[i] : (stateVfxParent != null ? stateVfxParent : transform);
+                instances[i] = CreateStateVfxInstanceAt(prefab, parent);
+            }
+
+            return instances;
+        }
+
+        private static GameObject CreateStateVfxInstanceAt(GameObject prefab, Transform parent)
+        {
             GameObject instance = Instantiate(prefab, parent);
-            instance.transform.localPosition = Vector3.zero;
-            instance.transform.localRotation = Quaternion.identity;
+            Transform instanceTransform = instance.transform;
+            instanceTransform.localPosition = Vector3.zero;
+            instanceTransform.localRotation = Quaternion.identity;
             instance.SetActive(false);
             return instance;
         }
@@ -341,13 +375,20 @@ namespace YuukiDev.OtherScripts
             }
         }
 
-        private static void SetStateVfxActive(GameObject vfxObject, bool shouldBeActive)
+        private static void SetStateVfxActive(GameObject[] vfxObjects, bool shouldBeActive)
         {
-            if (vfxObject == null)
+            if (vfxObjects == null)
                 return;
 
-            if (vfxObject.activeSelf != shouldBeActive)
-                vfxObject.SetActive(shouldBeActive);
+            for (int i = 0; i < vfxObjects.Length; i++)
+            {
+                GameObject vfxObject = vfxObjects[i];
+                if (vfxObject == null)
+                    continue;
+
+                if (vfxObject.activeSelf != shouldBeActive)
+                    vfxObject.SetActive(shouldBeActive);
+            }
         }
 
         private void UpdateCameraSpeedlineBySpeed()
@@ -441,5 +482,140 @@ namespace YuukiDev.OtherScripts
             vfxTransform.rotation = cam.transform.rotation;
             vfxTransform.localScale = speedlineScale;
         }
+
+        private void UpdateTrailSpawnPoints()
+        {
+            if (!followTrailSpawnPoints || trailSpawnPoints == null || trailSpawnPoints.Length == 0 || glideTrails == null)
+                return;
+
+            Transform forwardRef = trailForwardReference != null ? trailForwardReference : player.transform;
+            Quaternion noRollRotation = forwardRef != null
+                ? Quaternion.LookRotation(forwardRef.forward, Vector3.up)
+                : Quaternion.identity;
+
+            int lastIndex = trailSpawnPoints.Length - 1;
+            for (int i = 0; i < glideTrails.Length; i++)
+            {
+                TrailRenderer trail = glideTrails[i];
+                if (trail == null)
+                    continue;
+
+                int index = Mathf.Clamp(i, 0, lastIndex);
+                Transform spawnPoint = trailSpawnPoints[index];
+                if (spawnPoint == null)
+                    continue;
+
+                trail.transform.position = spawnPoint.position;
+                trail.transform.rotation = ignorePlayerRollForTrails ? noRollRotation : spawnPoint.rotation;
+            }
+        }
+
+        private void EnsureTrailReferences()
+        {
+            if ((glideTrails == null || glideTrails.Length == 0) && player != null)
+                glideTrails = player.GetComponentsInChildren<TrailRenderer>(true);
+
+            if (glideTrails == null || glideTrails.Length == 0)
+                return;
+        }
+
+        private void ResolveTrailSpawnPoints()
+        {
+            if (trailSpawnPoints != null && trailSpawnPoints.Length > 0)
+            {
+                bool hasNull = false;
+                for (int i = 0; i < trailSpawnPoints.Length; i++)
+                {
+                    if (trailSpawnPoints[i] == null)
+                    {
+                        hasNull = true;
+                        break;
+                    }
+                }
+
+                if (!hasNull)
+                    return;
+            }
+
+            if (!autoResolveTrailSpawnPoints)
+                return;
+
+            if (trailSpawnRoot == null && player != null)
+            {
+                Transform found = null;
+
+                if (!string.IsNullOrWhiteSpace(trailSpawnRootName))
+                {
+                    Transform[] all = player.GetComponentsInChildren<Transform>(true);
+                    for (int i = 0; i < all.Length; i++)
+                    {
+                        Transform candidate = all[i];
+                        if (candidate != null && candidate.name == trailSpawnRootName)
+                        {
+                            found = candidate;
+                            break;
+                        }
+                    }
+                }
+
+                if (found != null)
+                    trailSpawnRoot = found;
+            }
+
+            if (trailSpawnRoot == null)
+                return;
+
+            System.Collections.Generic.List<Transform> points = new System.Collections.Generic.List<Transform>();
+            for (int i = 0; i < trailSpawnRoot.childCount; i++)
+            {
+                Transform child = trailSpawnRoot.GetChild(i);
+                if (child == null)
+                    continue;
+
+                if (!string.IsNullOrEmpty(trailSpawnPointNameFilter))
+                {
+                    if (!child.name.Contains(trailSpawnPointNameFilter))
+                        continue;
+                }
+
+                points.Add(child);
+            }
+
+            if (points.Count == 0)
+            {
+                for (int i = 0; i < trailSpawnRoot.childCount; i++)
+                {
+                    Transform child = trailSpawnRoot.GetChild(i);
+                    if (child != null)
+                        points.Add(child);
+                }
+            }
+
+            if (points.Count > 0)
+                trailSpawnPoints = points.ToArray();
+        }
+
+        private void CacheTrailPropertyIds()
+        {
+            trailPrimaryColorId = Shader.PropertyToID(trailPrimaryColorProperty);
+            trailSecondaryColorId = Shader.PropertyToID(trailSecondaryColorProperty);
+            if (trailPropertyBlock == null)
+                trailPropertyBlock = new MaterialPropertyBlock();
+        }
+
+        private void ApplyTrailMaterialColors(TrailRenderer trail, Color primary, Color secondary)
+        {
+            if (trail == null)
+                return;
+
+            if (trailPropertyBlock == null)
+                trailPropertyBlock = new MaterialPropertyBlock();
+
+            trail.GetPropertyBlock(trailPropertyBlock);
+            trailPropertyBlock.SetColor(trailPrimaryColorId, primary);
+            trailPropertyBlock.SetColor(trailSecondaryColorId, secondary);
+            trail.SetPropertyBlock(trailPropertyBlock);
+        }
+
     }
 }
